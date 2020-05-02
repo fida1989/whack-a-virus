@@ -139,22 +139,25 @@ class _HomePageState extends State<HomePage> {
 
   Widget _bodyView() {
     return Container(
-      child: GridView.count(
-        // Create a grid with 2 columns. If you change the scrollDirection to
-        // horizontal, this produces 2 rows.
-        crossAxisCount: 3,
-        shrinkWrap: true,
-        // Generate 100 widgets that display their index in the List.
-        children: _virusList.map((Virus v) {
-          return _virusView(v);
-        }).toList(),
+      margin: EdgeInsets.only(left: 10,right: 10),
+      child: Card(
+        child: GridView.count(
+          // Create a grid with 2 columns. If you change the scrollDirection to
+          // horizontal, this produces 2 rows.
+          crossAxisCount: 4,
+          shrinkWrap: true,
+          // Generate 100 widgets that display their index in the List.
+          children: _virusList.map((Virus v) {
+            return _virusView(v);
+          }).toList(),
+        ),
       ),
     );
   }
 
   void _generateList() {
     List<Virus> _tempList = [];
-    int count = 9;
+    int count = 16;
     for (int i = 0; i < count; i++) {
       _tempList.add(Virus(VirusStatus.none));
     }
