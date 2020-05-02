@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:package_info/package_info.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:share/share.dart';
@@ -131,6 +132,12 @@ class _SettingsPageState extends State<SettingsPage> {
         width: MediaQuery.of(context).size.width / 3,
       ),
       title: name + " " + version,
+      content: Linkify(
+        onOpen: (link) {
+          _launchURL(link.url);
+        },
+        text: "Icons By https://iconpacks.net",
+      ),
       style: AlertStyle(isOverlayTapDismiss: false, isCloseButton: false),
       buttons: [
         DialogButton(
