@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:condition/condition.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +14,7 @@ import 'package:whackavirus/screens/scorepage.dart';
 import 'package:whackavirus/screens/settingspage.dart';
 import 'package:whackavirus/models/virus.dart';
 import 'package:whackavirus/utils/virusstatus.dart';
+import 'package:intl/intl.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -27,7 +29,6 @@ class _HomePageState extends State<HomePage> {
   int _total = 0;
   int _whacked = 0;
   int _missed = 0;
-  List<Score> _scoreList = [];
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +56,6 @@ class _HomePageState extends State<HomePage> {
             int _previous = 0;
             int _current = 0;
             _timer = Timer.periodic(Duration(seconds: 1), (Timer t) {
-              print('hi!');
               _current = _generateRandom(0, 9);
               setState(() {
                 if (_virusList[_previous].status == VirusStatus.whacked) {
@@ -65,7 +65,6 @@ class _HomePageState extends State<HomePage> {
                 } else {
                   _virusList[_previous].status = VirusStatus.none;
                 }
-
                 _virusList[_current].status = VirusStatus.visible;
                 _missed = _total - _whacked;
                 _total = _total + 1;
@@ -139,15 +138,17 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _bodyView() {
-    return GridView.count(
-      // Create a grid with 2 columns. If you change the scrollDirection to
-      // horizontal, this produces 2 rows.
-      crossAxisCount: 3,
-      shrinkWrap: true,
-      // Generate 100 widgets that display their index in the List.
-      children: _virusList.map((Virus v) {
-        return _virusView(v);
-      }).toList(),
+    return Container(
+      child: GridView.count(
+        // Create a grid with 2 columns. If you change the scrollDirection to
+        // horizontal, this produces 2 rows.
+        crossAxisCount: 3,
+        shrinkWrap: true,
+        // Generate 100 widgets that display their index in the List.
+        children: _virusList.map((Virus v) {
+          return _virusView(v);
+        }).toList(),
+      ),
     );
   }
 
@@ -213,8 +214,12 @@ class _HomePageState extends State<HomePage> {
             child: Card(
               child: Container(
                 margin: EdgeInsets.all(10),
-                child: Text(
+                child: AutoSizeText(
                   "Total: " + _total.toString(),
+                  minFontSize: 15,
+                  maxFontSize: 25,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                       fontWeight: FontWeight.bold, color: Colors.blue),
                 ),
@@ -226,8 +231,12 @@ class _HomePageState extends State<HomePage> {
             child: Card(
               child: Container(
                 margin: EdgeInsets.all(10),
-                child: Text(
+                child: AutoSizeText(
                   "Whacked: " + _whacked.toString(),
+                  minFontSize: 15,
+                  maxFontSize: 25,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                       fontWeight: FontWeight.bold, color: Colors.green),
                 ),
@@ -239,8 +248,12 @@ class _HomePageState extends State<HomePage> {
             child: Card(
               child: Container(
                 margin: EdgeInsets.all(10),
-                child: Text(
+                child: AutoSizeText(
                   "Missed: " + _missed.toString(),
+                  minFontSize: 15,
+                  maxFontSize: 25,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style:
                       TextStyle(fontWeight: FontWeight.bold, color: Colors.red),
                 ),
@@ -261,7 +274,7 @@ class _HomePageState extends State<HomePage> {
         width: MediaQuery.of(context).size.width / 3,
       ),
       title: whacked > missed ? "Mission Success!" : "Mission Fail!",
-      desc: "You whacked $total viruses!",
+      desc: "You whacked $whacked viruses!",
       style: AlertStyle(isOverlayTapDismiss: false, isCloseButton: false),
       buttons: [
         DialogButton(
@@ -272,7 +285,8 @@ class _HomePageState extends State<HomePage> {
           ),
           onPressed: () async {
             var box = await Hive.openBox('score');
-            var score = Score(total,whacked > missed);
+            var score = Score(whacked, whacked > missed,
+                DateFormat("MMM d 'at' hh:mm a").format(DateTime.now()));
             await box.add(score);
             await box.close();
             Navigator.pop(context);

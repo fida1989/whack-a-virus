@@ -19,17 +19,27 @@ dependencies:
   hive: ^1.4.1+1
   hive_flutter: ^0.3.0+2
   path_provider: ^1.6.7
+  intl: ^0.16.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   hive_generator: ^0.7.0+2
   build_runner: ^1.9.0
+  flutter_launcher_icons: ^0.7.5
+  flutter_native_splash: ^0.1.9
 
+flutter_icons:
+  android: "ic_launcher"
+  ios: false
+  image_path: "images/virus.png"
+
+flutter_native_splash:
+  image: "images/virus.png"
+  color: "FFFFFF"
+  fill: true
 
 flutter:
   uses-material-design: true
-
   assets:
     - images/
-

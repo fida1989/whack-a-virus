@@ -19,16 +19,19 @@ class ScoreAdapter extends TypeAdapter<Score> {
     return Score(
       fields[0] as int,
       fields[1] as bool,
+      fields[2] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, Score obj) {
     writer
-      ..writeByte(2)
+      ..writeByte(3)
       ..writeByte(0)
       ..write(obj.score)
       ..writeByte(1)
-      ..write(obj.success);
+      ..write(obj.success)
+      ..writeByte(2)
+      ..write(obj.date);
   }
 }

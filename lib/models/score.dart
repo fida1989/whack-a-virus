@@ -10,5 +10,8 @@ class Score {
   @HiveField(1)
   bool success;
 
-  Score(this.score, this.success);
+  @HiveField(2)
+  String date;
+
+  Score(this.score, this.success, this.date);
 }
