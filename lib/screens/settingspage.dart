@@ -32,10 +32,25 @@ class _SettingsPageState extends State<SettingsPage> {
       children: <Widget>[
         ListTile(
           trailing: Icon(
+            Icons.info,
+            color: Theme.of(context).primaryColor,
+          ),
+          title: Text('About'),
+          onTap: () async {
+            // Update the state of the app
+            PackageInfo packageInfo = await PackageInfo.fromPlatform();
+            _showAboutDialog(packageInfo.appName, packageInfo.version);
+          },
+        ),
+        Divider(
+          color: Colors.grey,
+        ),
+        ListTile(
+          trailing: Icon(
             Icons.rate_review,
             color: Theme.of(context).primaryColor,
           ),
-          title: Text('Rate App'),
+          title: Text('Rate'),
           onTap: () {
             // Update the state of the app
             //_launchURL("https://play.google.com/store/apps/details?id=com.hungrydroid.whackavirus");
@@ -49,27 +64,12 @@ class _SettingsPageState extends State<SettingsPage> {
             Icons.share,
             color: Theme.of(context).primaryColor,
           ),
-          title: Text('Share App'),
+          title: Text('Share'),
           onTap: () {
             // Update the state of the app
 
             Share.share(
                 "https://play.google.com/store/apps/details?id=com.hungrydroid.whackavirus");
-          },
-        ),
-        Divider(
-          color: Colors.grey,
-        ),
-        ListTile(
-          trailing: Icon(
-            Icons.info,
-            color: Theme.of(context).primaryColor,
-          ),
-          title: Text('About'),
-          onTap: () async {
-            // Update the state of the app
-            PackageInfo packageInfo = await PackageInfo.fromPlatform();
-            _showAboutDialog(packageInfo.appName, packageInfo.version);
           },
         ),
         Divider(

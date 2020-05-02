@@ -5,11 +5,14 @@ import 'package:condition/condition.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:hive/hive.dart';
 import 'package:page_transition/page_transition.dart';
-import 'package:whackavirus/screens/score.dart';
-import 'package:whackavirus/screens/settings.dart';
-import 'package:whackavirus/virus.dart';
-import 'package:whackavirus/virusstatus.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:whackavirus/models/score.dart';
+import 'package:whackavirus/screens/scorepage.dart';
+import 'package:whackavirus/screens/settingspage.dart';
+import 'package:whackavirus/models/virus.dart';
+import 'package:whackavirus/utils/virusstatus.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -24,6 +27,7 @@ class _HomePageState extends State<HomePage> {
   int _total = 0;
   int _whacked = 0;
   int _missed = 0;
+  List<Score> _scoreList = [];
 
   @override
   Widget build(BuildContext context) {
@@ -39,8 +43,12 @@ class _HomePageState extends State<HomePage> {
         onPressed: () {
           if (_timerRunning) {
             _timer.cancel();
+            _showScoreDialog(_total, _whacked, _missed);
             setState(() {
               _timerRunning = false;
+              _total = 0;
+              _whacked = 0;
+              _missed = 0;
             });
             _generateList();
           } else {
@@ -59,6 +67,8 @@ class _HomePageState extends State<HomePage> {
                 }
 
                 _virusList[_current].status = VirusStatus.visible;
+                _missed = _total - _whacked;
+                _total = _total + 1;
               });
               _previous = _current;
             });
@@ -85,7 +95,9 @@ class _HomePageState extends State<HomePage> {
                   context,
                   PageTransition(
                     type: PageTransitionType.rightToLeft,
-                    child: ScorePage(),),);
+                    child: ScorePage(),
+                  ),
+                );
               },
             ),
             IconButton(
@@ -95,10 +107,12 @@ class _HomePageState extends State<HomePage> {
               ),
               onPressed: () {
                 Navigator.push(
-                    context,
-                    PageTransition(
-                        type: PageTransitionType.rightToLeft,
-                        child: SettingsPage(),),);
+                  context,
+                  PageTransition(
+                    type: PageTransitionType.rightToLeft,
+                    child: SettingsPage(),
+                  ),
+                );
               },
             ),
           ],
@@ -164,8 +178,10 @@ class _HomePageState extends State<HomePage> {
                 onTap: () {
                   setState(() {
                     v.status = VirusStatus.whacked;
+                    _whacked = _whacked + 1;
                   });
-                  Future.delayed(Duration(milliseconds: 500), () {
+
+                  Future.delayed(Duration(milliseconds: 250), () {
                     setState(() {
                       v.status = VirusStatus.none;
                     });
@@ -234,5 +250,36 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
     );
+  }
+
+  void _showScoreDialog(int total, int whacked, int missed) {
+    Alert(
+      context: context,
+      image: Image.asset(
+        whacked > missed ? "images/success.png" : "images/fail.png",
+        fit: BoxFit.contain,
+        width: MediaQuery.of(context).size.width / 3,
+      ),
+      title: whacked > missed ? "Mission Success!" : "Mission Fail!",
+      desc: "You whacked $total viruses!",
+      style: AlertStyle(isOverlayTapDismiss: false, isCloseButton: false),
+      buttons: [
+        DialogButton(
+          color: Theme.of(context).primaryColor,
+          child: Text(
+            "Close",
+            style: TextStyle(color: Colors.white, fontSize: 20),
+          ),
+          onPressed: () async {
+            var box = await Hive.openBox('score');
+            var score = Score(total,whacked > missed);
+            await box.add(score);
+            await box.close();
+            Navigator.pop(context);
+          },
+          width: 120,
+        )
+      ],
+    ).show();
   }
 }
