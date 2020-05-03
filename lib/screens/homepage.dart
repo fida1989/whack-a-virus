@@ -6,9 +6,11 @@ import 'package:condition/condition.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:soundpool/soundpool.dart';
 import 'package:whackavirus/models/score.dart';
 import 'package:whackavirus/screens/scorepage.dart';
 import 'package:whackavirus/screens/settingspage.dart';
@@ -29,6 +31,18 @@ class _HomePageState extends State<HomePage> {
   int _total = 0;
   int _whacked = 0;
   int _missed = 0;
+  Soundpool _soundpool;
+  int _alarmSoundStreamId;
+  Future<int> _popSoundId;
+  Future<int> _whackSoundId;
+  Future<int> _resultSoundId;
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    _soundpool.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,9 +55,10 @@ class _HomePageState extends State<HomePage> {
         elevation: 4.0,
         icon: _timerRunning ? Icon(Icons.stop) : Icon(Icons.play_arrow),
         label: _timerRunning ? Text('Stop Game') : Text('Start Game'),
-        onPressed: () {
+        onPressed: () async {
           if (_timerRunning) {
             _timer.cancel();
+            await _playResultSound();
             _showScoreDialog(_total, _whacked, _missed);
             setState(() {
               _timerRunning = false;
@@ -55,7 +70,7 @@ class _HomePageState extends State<HomePage> {
           } else {
             int _previous = 0;
             int _current = 0;
-            _timer = Timer.periodic(Duration(seconds: 1), (Timer t) {
+            _timer = Timer.periodic(Duration(seconds: 1), (Timer t) async {
               _current = _generateRandom(0, 9);
               setState(() {
                 if (_virusList[_previous].status == VirusStatus.whacked) {
@@ -70,6 +85,7 @@ class _HomePageState extends State<HomePage> {
                 _total = _total + 1;
               });
               _previous = _current;
+              await _playPopSound();
             });
             setState(() {
               _timerRunning = true;
@@ -132,10 +148,43 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     // TODO: implement initState
     super.initState();
+
     SchedulerBinding.instance.addPostFrameCallback((_) {
+      _soundpool = Soundpool();
+      _popSoundId = _loadPopSound();
+      _whackSoundId = _loadWhackSound();
+      _resultSoundId = _loadResultSound();
       _generateList();
     });
   }
+
+  Future<int> _loadPopSound() async {
+    return await _soundpool.load(await rootBundle.load("sounds/pop.mp3"));
+  }
+
+  Future<int> _loadWhackSound() async {
+    return await _soundpool.load(await rootBundle.load("sounds/twang.mp3"));
+  }
+
+  Future<int> _loadResultSound() async {
+    return await _soundpool.load(await rootBundle.load("sounds/clang.mp3"));
+  }
+
+
+  Future<void> _playPopSound() async {
+    await _soundpool.play(await _popSoundId);
+  }
+
+  Future<void> _playWhackSound() async {
+    await _soundpool.play(await _whackSoundId);
+  }
+
+  Future<void> _playResultSound() async {
+    await _soundpool.play(await _resultSoundId);
+  }
+
+
+
 
   Widget _bodyView() {
     return Container(
@@ -183,6 +232,8 @@ class _HomePageState extends State<HomePage> {
                   setState(() {
                     v.status = VirusStatus.whacked;
                     _whacked = _whacked + 1;
+                    _playWhackSound();
+
                   });
 
                   Future.delayed(Duration(milliseconds: 250), () {

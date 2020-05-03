@@ -78,7 +78,7 @@ class _SettingsPageState extends State<SettingsPage> {
         ),
         ListTile(
           trailing: Icon(
-            Icons.info,
+            Icons.apps,
             color: Theme.of(context).primaryColor,
           ),
           title: Text('More Apps'),
