@@ -1,4 +1,6 @@
 # Whack A Virus
+<img src="https://github.com/fida1989/whack-a-virus/blob/master/images/virus.png" width="200">
+
 A virus themed whack-a-mole type game built with [Flutter](https://flutter.dev).
 
 
