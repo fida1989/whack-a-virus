@@ -2,14 +2,12 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:condition/condition.dart';
+import 'package:conditioned/conditioned.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:whackavirus/models/virus.dart';
 import 'package:whackavirus/utils/virusstatus.dart';
-
 
 class HomePage extends StatefulWidget {
   @override
@@ -19,15 +17,17 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   List<Virus> _virusList = [];
   bool _timerRunning = false;
-  Timer _timer;
+  late Timer _timer;
   final _random = Random();
   int _total = 0;
   int _whacked = 0;
   int _missed = 0;
 
-
   @override
   void dispose() {
+    if (_timerRunning) {
+      _timer.cancel();
+    }
     super.dispose();
   }
 
@@ -35,7 +35,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Whack A Virus"),
+        title: Text("Whack A Dorbesh"),
         centerTitle: true,
       ),
       floatingActionButton: FloatingActionButton.extended(
@@ -45,7 +45,6 @@ class _HomePageState extends State<HomePage> {
         onPressed: () async {
           if (_timerRunning) {
             _timer.cancel();
-
             _showScoreDialog(_total, _whacked, _missed);
             setState(() {
               _timerRunning = false;
@@ -71,7 +70,8 @@ class _HomePageState extends State<HomePage> {
                 _missed = _total - _whacked;
                 _total = _total + 1;
               });
-              _previous = _current;;
+              _previous = _current;
+              ;
             });
             setState(() {
               _timerRunning = true;
@@ -102,11 +102,9 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-
-
   Widget _bodyView() {
     return Container(
-      margin: EdgeInsets.only(left: 10,right: 10),
+      margin: EdgeInsets.only(left: 10, right: 10),
       child: Card(
         child: GridView.count(
           // Create a grid with 2 columns. If you change the scrollDirection to
@@ -141,7 +139,7 @@ class _HomePageState extends State<HomePage> {
           cases: [
             Case(
               v.status == VirusStatus.none,
-              builder: () => Image.asset("images/virus_white.png"),
+              builder: () => Placeholder(),
             ),
             Case(
               v.status == VirusStatus.visible,
@@ -150,7 +148,6 @@ class _HomePageState extends State<HomePage> {
                   setState(() {
                     v.status = VirusStatus.whacked;
                     _whacked = _whacked + 1;
-
                   });
 
                   Future.delayed(Duration(milliseconds: 250), () {
@@ -159,12 +156,12 @@ class _HomePageState extends State<HomePage> {
                     });
                   });
                 },
-                child: Image.asset("images/virus.png"),
+                child: Image.asset("images/dorbesh.png"),
               ),
             ),
             Case(
               v.status == VirusStatus.whacked,
-              builder: () => Image.asset("images/virus_whacked.png"),
+              builder: () => Image.asset("images/dorbesh_whacked.png"),
             ),
           ],
           defaultBuilder: () => Container(),
@@ -240,12 +237,12 @@ class _HomePageState extends State<HomePage> {
     Alert(
       context: context,
       image: Image.asset(
-        whacked > missed ? "images/success.png" : "images/fail.png",
+        "images/dorbesh.png",
         fit: BoxFit.contain,
-        width: MediaQuery.of(context).size.width / 3,
+        width: 200,
       ),
-      title: whacked > missed ? "Mission Success!" : "Mission Fail!",
-      desc: "You whacked $whacked viruses!",
+      title: "Game Over!",
+      desc: "You whacked Dorbesh $whacked times!",
       style: AlertStyle(isOverlayTapDismiss: false, isCloseButton: false),
       buttons: [
         DialogButton(

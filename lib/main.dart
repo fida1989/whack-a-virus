@@ -12,8 +12,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Whack A Virus',
+      title: 'Whack A Dorbesh',
       theme: ThemeData(
+        useMaterial3: false,
         primarySwatch: Colors.red,
       ),
       home: HomePage(),
